@@ -1,2 +1,2 @@
 # assembly-compilator-csharp
-ASsembly compilator in c#
+Assembly compilator in c#
