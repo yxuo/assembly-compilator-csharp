@@ -1,0 +1,11 @@
+FUNCTION SOMAR : a, b
+     VAR resultado
+     resultado = a + b
+     RETURN resultado
+END
+VAR x
+VAR y
+x = LER
+y = LER
+x = SOMAR(x,y)
+ESCREVER x

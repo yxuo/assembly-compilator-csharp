@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Nuvem\\pCloud\\Documentos\\Programacao\\GitHub\\projects\\assembly-compilator-csharp\\CompiladorAssembly\\CompiladorAssembly.csproj": {}
+    "D:\\assembly-compilator-csharp\\CompiladorAssembly\\CompiladorAssembly.csproj": {}
   },
   "projects": {
-    "D:\\Nuvem\\pCloud\\Documentos\\Programacao\\GitHub\\projects\\assembly-compilator-csharp\\CompiladorAssembly\\CompiladorAssembly.csproj": {
+    "D:\\assembly-compilator-csharp\\CompiladorAssembly\\CompiladorAssembly.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Nuvem\\pCloud\\Documentos\\Programacao\\GitHub\\projects\\assembly-compilator-csharp\\CompiladorAssembly\\CompiladorAssembly.csproj",
+        "projectUniqueName": "D:\\assembly-compilator-csharp\\CompiladorAssembly\\CompiladorAssembly.csproj",
         "projectName": "CompiladorAssembly",
-        "projectPath": "D:\\Nuvem\\pCloud\\Documentos\\Programacao\\GitHub\\projects\\assembly-compilator-csharp\\CompiladorAssembly\\CompiladorAssembly.csproj",
-        "packagesPath": "C:\\Users\\Rapha\\.nuget\\packages\\",
-        "outputPath": "D:\\Nuvem\\pCloud\\Documentos\\Programacao\\GitHub\\projects\\assembly-compilator-csharp\\CompiladorAssembly\\obj\\",
+        "projectPath": "D:\\assembly-compilator-csharp\\CompiladorAssembly\\CompiladorAssembly.csproj",
+        "packagesPath": "C:\\Users\\glhrm\\.nuget\\packages\\",
+        "outputPath": "D:\\assembly-compilator-csharp\\CompiladorAssembly\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Rapha\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\glhrm\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
