@@ -8,17 +8,27 @@ namespace CompiladorAssembly.Controller
 {
     class Compilador
     {
-        public Dictionary<int,dynamic> Lista { get; set; } 
-        public void LerArquivo()
+        public List<string> Lista { get; set; } = new List<string>();
+        public int Cont { get; set; }
+        public List<string> LerArquivo()
         {
-            var line = File.ReadAllLines("./Teste.txt");
-            for (int i = 0; i < line.Length; i++)
+            using (StreamReader sr = new StreamReader("./Teste.txt"))
             {
-                foreach (var item in line[i])
+                while (!sr.EndOfStream)
                 {
-                    Lista.Add(i, item);
+                    string line = sr.ReadLine().Trim();                    
+                    Lista.Add(line);
+                    Cont++;
                 }
             }
+            GetValoresVariavel();
+            return Lista;
+        }
+        public void GetValoresVariavel()
+        {
+            string valorProcurado = "VAR";
+            int indice = Lista.FindIndex(linha => linha == valorProcurado);
+            string texto = Lista[indice];
         }
     }
 }
