@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -10,7 +11,7 @@ namespace CompiladorAssembly.Controller
     class Compilador
     {
         public List<string> Lista { get; set; } = new List<string>();
-        public Dictionary<int,string> Resultados { get; set; } = new Dictionary<int, string>();
+        public List<string> Resultados { get; set; } = new List<string>();
         public int Cont { get; set; }
         public List<string> LerArquivo()
         {
@@ -21,35 +22,40 @@ namespace CompiladorAssembly.Controller
                     string line = sr.ReadLine().Trim();
                     Lista.Add(line);
                     Cont++;
-                    GetValoresVar(line,Cont);
                 }
             }
-            //Essa função vai separar os tokens var
+            GetValoresVar(Lista);
             return Lista;
         }
-        //public List<string> Tokens()
-        //{
-        //    List<string> tokens = new List<string>
-        //    {
-        //        "VAR",
-        //        "WHILE",
-        //        "END",
-        //        "IF",
-        //        "FUNCTION",
-        //        "RETURN",
-        //        "LER",
-        //        "ESCREVER"
-        //    };
-        //    return tokens;
-        //}
-        public Dictionary<int, string> GetValoresVar(string valor,int count)
-        {           
-            Regex regex = new Regex("var", RegexOptions.IgnoreCase); // IgnoreCase para buscar independentemente de maiúsculas e minúsculas
-            if (regex.IsMatch(valor))
+        public List<string> GetValoresVar(List<string> valor)
+        {
+            Regex regex = new Regex("var", RegexOptions.IgnoreCase);// IgnoreCase para buscar independentemente de maiúsculas e minúsculas
+            string[] val;
+            foreach (var item in valor)
             {
-                Resultados.Add(count,valor);
+                if (regex.IsMatch(item))
+                {
+                    val = item.Split(" ");
+                    Resultados.Add(val[1]);
+                    AtribuiçoesVar(val[1], valor);
+                }
             }
             return Resultados;
+        }
+        public void AtribuiçoesVar(string achar_valores, List<string> valor)
+        {
+            Regex regex = new Regex(achar_valores);
+            string[] separador;
+            foreach (var item in valor)
+            {
+                if (regex.IsMatch(item))
+                {
+                    if (item.Contains('='))
+                    {
+                        separador = item.Split("=");
+                    }
+                }
+            }            
         }
     }
 }
