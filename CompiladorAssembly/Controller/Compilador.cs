@@ -10,6 +10,7 @@ namespace CompiladorAssembly.Controller
     class Compilador
     {
         public List<string> Lista { get; set; } = new List<string>();
+        public Dictionary<int,string> Resultados { get; set; } = new Dictionary<int, string>();
         public int Cont { get; set; }
         public List<string> LerArquivo()
         {
@@ -20,40 +21,35 @@ namespace CompiladorAssembly.Controller
                     string line = sr.ReadLine().Trim();
                     Lista.Add(line);
                     Cont++;
+                    GetValoresVar(line,Cont);
                 }
             }
-            GetValoresVariavel();
+            //Essa função vai separar os tokens var
             return Lista;
         }
-        public List<string> Tokens()
-        {
-            List<string> tokens = new List<string>
+        //public List<string> Tokens()
+        //{
+        //    List<string> tokens = new List<string>
+        //    {
+        //        "VAR",
+        //        "WHILE",
+        //        "END",
+        //        "IF",
+        //        "FUNCTION",
+        //        "RETURN",
+        //        "LER",
+        //        "ESCREVER"
+        //    };
+        //    return tokens;
+        //}
+        public Dictionary<int, string> GetValoresVar(string valor,int count)
+        {           
+            Regex regex = new Regex("var", RegexOptions.IgnoreCase); // IgnoreCase para buscar independentemente de maiúsculas e minúsculas
+            if (regex.IsMatch(valor))
             {
-                "VAR",
-                "WHILE",
-                "END",
-                "IF",
-                "FUNCTION",
-                "RETURN",
-                "LER",
-                "ESCREVER"
-            };
-            return tokens;
-        }
-        public void GetValoresVariavel()
-        {
-            List<string> resultados = new List<string>();
-            foreach (string tokem in Tokens())
-            {
-                Regex regex = new Regex(tokem, RegexOptions.IgnoreCase); // IgnoreCase para buscar independentemente de maiúsculas e minúsculas
-                foreach (string texto in Lista)
-                {
-                    if (regex.IsMatch(texto))
-                    {
-                        resultados.Add(texto);
-                    }
-                }
+                Resultados.Add(count,valor);
             }
+            return Resultados;
         }
     }
 }
