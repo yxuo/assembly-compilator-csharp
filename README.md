@@ -6,13 +6,9 @@ Compilador assembly em c#
 
 - [ ] Desenvolver a estrutura a ser criada
 
-
 ## Desenvolvimento
 
-Primeira coisa: O que um compilador faz?
-> Compilador → Apenas cria um executável a partir do código fonte
-> 
-> Interpretador → Lê e executa código fonte linha por linha.
+Veja o [Relatório de Desenvolvimento](./doc/relatorio-desenvolvimento.md)
 
 ## Requisitos
 
