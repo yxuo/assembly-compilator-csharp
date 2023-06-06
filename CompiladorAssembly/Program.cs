@@ -7,7 +7,8 @@ namespace CompiladorAssembly
         static void Main(string[] args)
         {
             Compilador compilador= new Compilador();
-            List<string> lista = compilador.LerArquivo();           
+            List<string> lista = compilador.LerArquivo();
+            Console.WriteLine("Arquivos:", lista);
         }
     }
 }

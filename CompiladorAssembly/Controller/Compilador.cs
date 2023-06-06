@@ -29,7 +29,8 @@ namespace CompiladorAssembly.Controller
         }
         public List<string> GetValoresVar(List<string> valor)
         {
-            Regex regex = new Regex("var", RegexOptions.IgnoreCase);// IgnoreCase para buscar independentemente de maiúsculas e minúsculas
+            // IgnoreCase para buscar independentemente de maiúsculas e minúsculas
+            Regex regex = new Regex("var", RegexOptions.IgnoreCase);
             string[] val;
             foreach (var item in valor)
             {
@@ -55,7 +56,7 @@ namespace CompiladorAssembly.Controller
                         separador = item.Split("=");
                     }
                 }
-            }            
+            }
         }
     }
 }
