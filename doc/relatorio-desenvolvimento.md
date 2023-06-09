@@ -1,6 +1,7 @@
 # Relatório de desenvolvimento do projeto
 
-## Metodologia
+## 
+
 1. Requisitos (em paralelo)
 2. Entender o projeto
 3. Sumarizar o que deve ser fe
@@ -16,9 +17,34 @@
 
 - CompiladorAssembly:classe
   - tokens:lista(str)
-  - 
+  - Lista de variáveis
 
-# 2. Entender o projeto
+# 2. Entender o código (professor)
+
+1. Pega o código e separa em array de str para cada linha (instrução)
+2. Para cada array de insturção, separa em tokens.
+3. Para cada linha, classifica o token
+4. Verifica 
+
+### Erros de código
+
+- Se tiver 2 variáveis sem operador, é erro léxico
+
+### Exemplo
+Precedência = `/ * - +`
+```
+x = y + z * k - z
+```
+
+1. Operador de maior precedência: `*`, Resolver `z * K` (à direita)
+
+   assembly:
+   ```
+MOVE A,Z
+MOVE B,K
+MULT A,B
+   ```
+
 
 ## O que o projeto faz, em resumo
 
