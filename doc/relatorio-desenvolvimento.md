@@ -1,12 +1,9 @@
 # Relatório de desenvolvimento do projeto
 
-## 
-
 1. Requisitos (em paralelo)
 2. Entender o projeto
-3. Sumarizar o que deve ser fe
-4. ito
-5. Analisar como fazer de forma rápida mas atingindo o objetivo proposto
+3. Sumarizar o que deve ser feito
+1. Analisar como fazer de forma rápida mas atingindo o objetivo proposto
 
 # 1. Requisitos
 

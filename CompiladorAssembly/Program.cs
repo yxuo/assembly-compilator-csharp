@@ -1,4 +1,4 @@
-﻿using CompiladorAssembly.Controller;
+﻿using CompiladorAssembly.Controllers;
 
 namespace CompiladorAssembly
 {
@@ -6,9 +6,8 @@ namespace CompiladorAssembly
     {
         static void Main(string[] args)
         {
-            Compilador compilador= new Compilador();
-            List<string> lista = compilador.LerArquivo();
-            Console.WriteLine("Arquivos:", lista);
+            Compilador compilador= new();
+            compilador.CompilarArquivo();
         }
     }
 }
