@@ -1,6 +1,4 @@
-﻿using System;
-using System.Text.RegularExpressions;
-using CompiladorAssembly.Models;
+﻿using CompiladorAssembly.Models;
 using CompiladorAssembly.Services;
 
 namespace CompiladorAssembly.Controllers
@@ -9,10 +7,11 @@ namespace CompiladorAssembly.Controllers
     public class CompiladorDados
     {
         public Dictionary<string, string> Registradores { get; set; } = new();
+        public List<string> Separadores { get; } = new List<string> { " ", ",", ":" };
         public IReadOnlyList<string> Operadores { get; } = new List<string> { "=", "+", "-", "*", "/", "==", "<", ">", "!" };
         public List<PalavraChave> PalavrasChave { get; set; } = new List<PalavraChave>
         {
-            new PalavraChaveGenérica("FUNCTION"),
+            new PalavraChaveGenérica("FUNCTION", new List<TokenTipo> { TokenTipo.PalavraChave }),
             new PalavraChaveGenérica("VAR"),
             new PalavraChaveGenérica("RETURN"),
             new PalavraChaveGenérica("END"),
@@ -23,6 +22,7 @@ namespace CompiladorAssembly.Controllers
         {
             return PalavrasChave.Select(p => p.Nome).ToList();
         }
+
     }
 
     class Compilador

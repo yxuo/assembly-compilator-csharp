@@ -3,28 +3,36 @@
 
     public enum TokenTipo
     {
+        // Padrão
         Indefinido,
-        Variável,
-        Operador,
-        Literal,
+
+        // Usado na linguagem
+        Variável,       // nomes
+        Operador,       // +-*/
+        Literal,        // Números
+
+        // Tipos auxiliares, para ajudar a identificar
+        // ! Registrador,    // Talvez não precisemos disso
+        PalavraChave,   // e.g. VAR, FUNCTION
+        NomeVálido,     // Nome válido de variável ou função
         Registrador,
-        PalavraChave
     }
 
     public class Token
     {
-        public TokenTipo Tipo { get; set; }
+        public List<TokenTipo> Tipos { get; set; }
         public string Valor { get; set; }
 
-        public Token(string valor = "", TokenTipo tipo = TokenTipo.Indefinido)
+        public Token(string valor = "", List<TokenTipo>? tipos = null)
         {
-            Tipo = tipo;
+            Tipos = tipos ?? new List<TokenTipo> {};
             Valor = valor;
         }
 
         public override string ToString()
         {
-            return "Token: '" + Valor + "'  Tipo: '" + Tipo + "'";
+            string tiposString = string.Join(", ", Tipos);
+            return $"Token: '{Valor}'  Tipos: [{tiposString}]";
         }
 
     }

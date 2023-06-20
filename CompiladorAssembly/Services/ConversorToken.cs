@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using CompiladorAssembly.Models;
+﻿using CompiladorAssembly.Models;
 using CompiladorAssembly.Controllers;
+using CompiladorAssembly.Services;
+using System.Text.RegularExpressions;
 
 namespace CompiladorAssembly.Services
 {
@@ -16,33 +16,67 @@ namespace CompiladorAssembly.Services
         public static List<Token> ConverterInstrucao(string instrucao, CompiladorDados compiladorDados)
         {
             List<Token> tokens = new();
-            string[] palavras = instrucao.Split(' ');
+            string[] palavras = Utils.SplitWithDelimiter(instrucao, compiladorDados.Separadores).ToArray();
+            // foreach (string s in palavras) { Console.Write("[" + s + "] "); } Console.WriteLine();
 
             // Gerar tokens com seus tipos
+            // List<TokenTipo> parâmetros = new() { };
             for (int i = 0; i < palavras.Length; i++)
             {
                 string palavra = palavras[i].Trim();
+                if (palavra.Length == 0)
+                {
+                    continue;
+                }
                 Token token = new(palavra);
 
+                // Se um parâmetro de PalavraChave (VAR, FUNCTION) já definiu o próximo tipo
+                // if (parâmetros.Count > 0)
+                // {
+                //     token.Tipos.Add(parâmetros[0]);
+                //     parâmetros.RemoveAt(0);
+                // }
+
+                // Adiciona os tipos
                 if (StrTokenEVariavel(palavras, i, compiladorDados))
                 {
-                    token.Tipo = TokenTipo.Variável;
+                    token.Tipos.Add(TokenTipo.Variável);
                 }
-                else if (StrTokenERegistrador(palavra, compiladorDados))
+
+                if (StrTokenERegistrador(palavra, compiladorDados))
                 {
-                    token.Tipo = TokenTipo.Registrador;
+                    token.Tipos.Add(TokenTipo.Registrador);
                 }
-                else if (StrTokenEOperador(palavra, compiladorDados))
+
+                if (StrTokenEOperador(palavra, compiladorDados))
                 {
-                    token.Tipo = TokenTipo.Operador;
+                    token.Tipos.Add(TokenTipo.Operador);
                 }
-                else if (StrTokenELiteral(palavra))
+
+                if (StrTokenELiteral(palavra))
                 {
-                    token.Tipo = TokenTipo.Literal;
+                    token.Tipos.Add(TokenTipo.Literal);
                 }
-                else if (StrTokenEPalavraChave(palavra, compiladorDados))
+
+                if (StrTokenENomeValido(palavra))
                 {
-                    token.Tipo = TokenTipo.PalavraChave;
+                    token.Tipos.Add(TokenTipo.NomeVálido);
+                }
+
+                // Se o token não possui tipo, adiciona Indefinido para indicar que foi analisado.
+                if (token.Tipos.Count == 0)
+                {
+                    token.Tipos.Add(TokenTipo.Indefinido);
+                }
+
+                if (StrTokenEPalavraChave(palavra, compiladorDados) && palavra!= null)
+                {
+                    token.Tipos.Add(TokenTipo.PalavraChave);
+                    // PalavraChave? palavraChave = compiladorDados.PalavrasChave.FirstOrDefault(p => p.Nome == palavra);
+                    // if (palavraChave != null)
+                    // {
+                    //     parâmetros.AddRange(palavraChave.Parâmetros);
+                    // }
                 }
 
                 tokens.Add(token);
@@ -77,6 +111,9 @@ namespace CompiladorAssembly.Services
             return compiladorDados.Operadores.Contains(palavra);
         }
 
+        /// <summary>
+        /// Se o token retorna Literal (apenas números)
+        /// </summary>
         private static bool StrTokenELiteral(string palavra)
         {
             return int.TryParse(palavra, out _);
@@ -85,6 +122,17 @@ namespace CompiladorAssembly.Services
         private static bool StrTokenERegistrador(string palavra, CompiladorDados compiladorDados)
         {
             return compiladorDados.Registradores.ContainsKey(palavra);
+        }
+
+
+        /// <summary>
+        /// Se o token retorna nome válido de variável e afins. <para />
+        /// Não pode conter caracteres especiais <br />
+        /// O primeiro caractere não pode ser número <br />
+        /// </summary>
+        private static bool StrTokenENomeValido(string palavra)
+        {
+            return Regex.IsMatch(palavra, @"^(?![0-9])(?!.*[\W]).*$");
         }
 
     }
