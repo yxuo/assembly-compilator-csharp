@@ -3,7 +3,8 @@
 1. Requisitos (em paralelo)
 2. Entender o projeto
 3. Sumarizar o que deve ser feito
-1. Analisar como fazer de forma rápida mas atingindo o objetivo proposto
+4. Analisar como fazer de forma rápida mas atingindo o objetivo proposto
+5. Requisitos
 
 # 1. Requisitos
 
@@ -37,9 +38,9 @@ x = y + z * k - z
 
    assembly:
    ```
-MOVE A,Z
-MOVE B,K
-MULT A,B
+   MOVE A,Z
+   MOVE B,K
+   MULT A,B
    ```
 
 
@@ -58,4 +59,29 @@ Temos um impasse que é saber quais os passos a fazer.
 
 - Ler cada linha e converter para token
 - Detectar tipos de cada token
-- 
+
+## 5. Requisitos
+
+1. Estruturar código
+2. Gerar Tokens
+3. Validar Tokens
+4. Gerar Assembly
+5. Testes
+
+### Validar tokens
+
+Como validar os tokens?
+* Erro léxico
+  * Caractere inválido
+* Erro sintático:
+  * Padrão inválido
+    * VAR <nome válido não usado>
+    * <palavra-chave> + N <parâmetros>
+    * N <nome válido / variável / literal> + N +1 <operador>  
+      Exemplo: 3 literais, 2 operadores
+  * variável não existe
+  * Função não existe
+  * Parâmetros incorretos
+  * Número de parâmetros incorretos
+* Erro semântico
+  * Variável, palavra/chave ou função não existe ainda.

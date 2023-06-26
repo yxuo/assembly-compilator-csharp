@@ -7,7 +7,7 @@ namespace CompiladorAssembly.Controllers
     public class CompiladorDados
     {
         public Dictionary<string, string> Registradores { get; set; } = new();
-        public List<string> Separadores { get; } = new List<string> { " ", ",", ":" };
+        public List<string> Separadores { get; } = new List<string> { " ", ",", ":" , "(", ")"};
         public IReadOnlyList<string> Operadores { get; } = new List<string> { "=", "+", "-", "*", "/", "==", "<", ">", "!" };
         public List<PalavraChave> PalavrasChave { get; set; } = new List<PalavraChave>
         {
@@ -39,7 +39,14 @@ namespace CompiladorAssembly.Controllers
             using StreamReader sr = new("./Teste.txt");
             while (!sr.EndOfStream)
             {
-                string linha = sr.ReadLine().Trim();
+                string? linha = sr.ReadLine();
+
+                if (linha == null)
+                {
+                    continue;
+                }
+                linha = linha.Trim();
+
                 List<Token> tokens = ConversorToken.ConverterInstrucao(linha, Dados);
 
                 Console.WriteLine(linha);
@@ -48,8 +55,9 @@ namespace CompiladorAssembly.Controllers
                 {
                     Console.WriteLine(token.ToString());
                 }
+                Console.WriteLine();
 
-                break;
+                // break;
             }
             // GetValoresVar(Lista);
         }

@@ -1,6 +1,5 @@
 ﻿using CompiladorAssembly.Models;
 using CompiladorAssembly.Controllers;
-using CompiladorAssembly.Services;
 using System.Text.RegularExpressions;
 
 namespace CompiladorAssembly.Services
@@ -69,8 +68,10 @@ namespace CompiladorAssembly.Services
                     token.Tipos.Add(TokenTipo.Indefinido);
                 }
 
+                // Se for palavra-chave, o tipo de token será apenas este.
                 if (StrTokenEPalavraChave(palavra, compiladorDados) && palavra!= null)
                 {
+                    token.Tipos.Clear();
                     token.Tipos.Add(TokenTipo.PalavraChave);
                     // PalavraChave? palavraChave = compiladorDados.PalavrasChave.FirstOrDefault(p => p.Nome == palavra);
                     // if (palavraChave != null)
