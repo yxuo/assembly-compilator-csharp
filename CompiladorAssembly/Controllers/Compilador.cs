@@ -27,7 +27,7 @@ namespace CompiladorAssembly.Controllers
 
     class Compilador
     {
-        public List<List<Token>> Tokens { get; set; } = new();
+        public List<List<Token>> InstruçõesTokens { get; set; } = new();
         public CompiladorDados Dados { get; set; } = new();
 
 
@@ -37,6 +37,8 @@ namespace CompiladorAssembly.Controllers
         public void CompilarArquivo()
         {
             using StreamReader sr = new("./Teste.txt");
+
+            // Transformar esse loop num método ConverterParaToken()
             while (!sr.EndOfStream)
             {
                 string? linha = sr.ReadLine();
@@ -47,19 +49,22 @@ namespace CompiladorAssembly.Controllers
                 }
                 linha = linha.Trim();
 
-                List<Token> tokens = ConversorToken.ConverterInstrucao(linha, Dados);
+                List<Token> instruçãoTokens = ConversorToken.ConverterInstrucao(linha, Dados);
 
                 Console.WriteLine(linha);
 
-                foreach (Token token in tokens)
+                foreach (Token token in instruçãoTokens)
                 {
                     Console.WriteLine(token.ToString());
                 }
                 Console.WriteLine();
 
-                // break;
+                // TODO: Adicionar instrução em instruçõesTokens
             }
-            // GetValoresVar(Lista);
+
+            // TODO: ValidadorToken.ValidarInstrçãoTokens()
+
+            // ...
         }
 
         // public List<string> GetValoresVar(List<string> valor)
