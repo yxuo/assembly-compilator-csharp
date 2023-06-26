@@ -75,9 +75,9 @@ Como validar os tokens?
   * Caractere inválido
 * Erro sintático:
   * Padrão inválido
-    * VAR <nome válido não usado>
-    * <palavra-chave> + N <parâmetros>
-    * N <nome válido / variável / literal> + N +1 <operador>  
+    * `VAR <nome válido não usado>`
+    * `<palavra-chave> + N <parâmetros>`
+    * `N <nome válido / variável / literal> + N +1 <operador>`
       Exemplo: 3 literais, 2 operadores
   * variável não existe
   * Função não existe
