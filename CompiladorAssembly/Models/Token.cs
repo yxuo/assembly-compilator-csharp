@@ -23,31 +23,83 @@ namespace CompiladorAssembly.Models
     public class Token
     {
         public List<TokenTipo> Tipos { get; set; }
-        public string Valor { get; set; } = "";
+        private string valor = "";
+        public int Precedência { get; set; } = -1;
+        public int Ordem
+        {
+            get
+            {
+                if (Precedência == -1)
+                {
+                    return Precedência;
+                }
+                return 3 - Precedência;
+            }
+        }
+        public string Valor
+        {
+            get
+            {
+                return this.valor;
+            }
+            set
+            {
+                // set precedência
+                List<string> precedência = new() { "+", "-", "*", "/" };
+                Precedência = precedência.IndexOf(value);
+                // set valor
+                this.valor = value;
+            }
+        }
 
         public Token(string valor = "", List<TokenTipo>? tipos = null)
         {
             Tipos = tipos ?? new List<TokenTipo> { };
-            Valor = valor;
+            this.Valor = valor;
         }
 
         public override string ToString()
         {
             string tiposString = string.Join(", ", Tipos);
-            return $"Token: '{Valor}'  Tipos: [{tiposString}]";
+            string retorno = $"Token: '{this.valor}'  Tipos: [{tiposString}]";
+            retorno += $" Precedência: '{Precedência}'";
+            // }
+            return retorno;
         }
 
     }
 
     public class Instrução : List<Token>
     {
-
         public int IndexOfValor(string nome)
         {
             for (int i = 0; i < this.Count(); i++)
             {
                 string valor = this[i].Valor;
                 if (valor == nome)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        public int GetFirstOfMaxPrecedência()
+        {
+            if (!this.Any())
+            {
+                return -1;
+            }
+            var maxObject = this.MaxBy(x => x.Precedência);
+            int maxIndex = this.FindIndex(x => x == maxObject);
+            return maxIndex;
+        }
+
+        public int IndexOfTipo(TokenTipo tipo)
+        {
+            for (int i = 0; i < this.Count(); i++)
+            {
+                if (this[i].Tipos.Contains(tipo))
                 {
                     return i;
                 }

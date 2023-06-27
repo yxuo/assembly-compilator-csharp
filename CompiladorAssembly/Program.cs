@@ -6,6 +6,7 @@ namespace CompiladorAssembly
     {
         static void Main(string[] args)
         {
+
             Compilador compilador= new();
             compilador.CompilarArquivo();
         }

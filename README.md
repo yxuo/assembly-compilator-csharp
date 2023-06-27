@@ -45,7 +45,7 @@ Veja o [Relatório de Desenvolvimento](./doc/relatorio-desenvolvimento.md)
 
 7. Para a leitura e escrita, a linguagem tem as funções:
    ```
-   <variável> = LER 
+   <variável> = LER
    ESCREVER <variável>
    ```
 

@@ -11,6 +11,7 @@ namespace CompiladorAssembly.Controllers
         public Dictionary<string, string> Registradores { get; set; } = new();
         public List<string> Separadores { get; } = new List<string> { " ", ",", ":", "(", ")" };
         public IReadOnlyList<string> Operadores { get; } = new List<string> { "=", "+", "-", "*", "/", "==", "<", ">", "!" };
+        public IReadOnlyList<string> Booleanos { get; } = new List<string> { "==", "<", ">", "!" };
         public List<PalavraChave> PalavrasChave { get; set; } = new List<PalavraChave>
         {
             new PalavraChaveGenérica("FUNCTION", new List<TokenTipo> { TokenTipo.PalavraChave }),
@@ -27,8 +28,11 @@ namespace CompiladorAssembly.Controllers
 
     }
 
+    public class MapOperadores : Dictionary<int, Token> { }
+
     class Compilador
     {
+
         // Dados usados vários lugares desse programa
         public CompiladorDados Dados { get; set; } = new();
 
@@ -41,11 +45,11 @@ namespace CompiladorAssembly.Controllers
         public bool IniciarLeitura { get; set; } = false;
         public List<string>? VariaveisNome { get; set; } = new();
         public List<string> InstruçãoLinha { get; set; } = new List<string>();
-        public List<dynamic>? VariaveisValor { get; set; } = new();
+        public List<dynamic>? MemóriaValor { get; set; } = new();
         public List<string> ÍndiceVariáveisLocais { get; set; } = new List<string>();
 
         public Dictionary<char, int> Variáveis { get; set; } = new();
-        public string? AssemblyText { get; set; }
+        public string AssemblyText { get; set; } = "";
 
         /// <summary>
         /// A partir de um arquivo, executa a compilação.
@@ -147,14 +151,14 @@ namespace CompiladorAssembly.Controllers
             }
             for (int j = 0; j < VariaveisNome.Count(); j++)
             {
-                AssemblyText += $"MOVE {VariaveisNome[j]}, {VariaveisValor[j]} \n";
+                AssemblyText += $"MOVE {VariaveisNome[j]}, {MemóriaValor[j]} \n";
             }
         }
         public void INT_1()
         {
-            Console.WriteLine("Digite o valor: ");
+            Console.WriteLine("Digite o número: ");
             Variavel = Console.ReadLine();
-            VariaveisValor.Add(Variavel);
+            MemóriaValor.Add(Variavel);
             AssemblyText += $"INT 1, {Variavel} \n";
         }
         public void FUNCTION()
@@ -232,247 +236,169 @@ namespace CompiladorAssembly.Controllers
             }
         }
 
-        public void WHILE(List<Instrução> instruções)
+
+        public void MOVE(string a, string b)
         {
-            string nome = "WHILE";
-            int índiceNome = VariaveisNome.IndexOf(nome);
-            // if (índiceNome )
-        }
-
-
-        public void VAR(List<Instrução> instruções)
-        {
-            foreach (Instrução instrução in instruções)
+            string comando = $"MOVE {a}, {b}";
+            if (!AssemblyText.Contains(comando))
             {
-                string nome = "VAR";
-                int índiceVAR = instrução.IndexOfValor(nome);
-                if (índiceVAR == -1)
-                {
-                    continue;
-                }
-
-                string x = instrução[índiceVAR + 1].Valor;
-
-                SetVariável(x, 0);
-                // AssemblyText += $"MOVE {VariaveisNome[j]},{VariaveisValor[j]} \n";
-
-            }
-
-            foreach (Instrução instrução in instruções)
-            {
-                VAR_FUNCTION(instrução);
+                AssemblyText += $"MOVE {a}, {b} \n";
             }
         }
 
-        public void VAR_FUNCTION(Instrução instrução)
+        public void SetOrUpdateVariaveisNome(string nome, int? updateValor = null)
         {
-            // variáveis
-            string nome = "FUNCTION";
-            int índiceVAR = instrução.IndexOfValor(nome);
-            if (índiceVAR == -1)
-            {
-                return;
-            }
-
-            // pega item 3+ e adiciona nomes váliddos
-
-            for (int i = índiceVAR + 3; i < instrução.Count(); i++)
-            {
-                Token token = instrução[i];
-                if (token.Tipos.Contains(TokenTipo.NomeVálido))
-                {
-                    string x = token.Valor;
-                    SetVariável(x, 0, nome);
-                    // AssemblyText += $"MOVE {VariaveisNome[j]},{VariaveisValor[j]} \n";
-                }
-            }
-        }
-
-
-
-        public void Operador(Instrução instrução)
-        {
-            // operadores
-            Dictionary<char, int> mapOpPrecedência = new()
-        {
-            { '/', 4 },
-            { '*', 3 },
-            { '-', 2 },
-            { '+', 1 },
-        };
-            char[] op = mapOpPrecedência.Keys.ToArray();
-            int[] prec = mapOpPrecedência.Values.ToArray();
-
-            // 1. Montar posição de cada operador
-            Dictionary<int, char> opÍndice = new();
-            for (int i = 0; i < instrução.Count(); i++)
-            {
-                // Transforma token em valor
-                Token token = instrução[i];
-                string valor = token.Valor;
-                if (valor == null)
-                {
-                    continue;
-                }
-                // Adiciona operador e índice se existir
-                bool valorÉOperador = valor.Any(c => op.Contains(c));
-                if (valorÉOperador)
-                {
-                    opÍndice.Add(i, valor[0]);
-                }
-            }
-
-            if (opÍndice.Count() == 0)
-            {
-                return;
-            }
-
-
-            // Transformar token de volta em string para calcular
-            string expressão = "";
-            int i0 = opÍndice.Keys.ToList()[0] - 1;
-            // Pega o item antes do 1o token e transforma em string
-            foreach (Token token1 in instrução.GetRange(i0, instrução.Count() - i0))
-            {
-                // obtém valor da variável
-                string var1 = token1.Valor;
-                if (token1.Tipos.Contains(TokenTipo.Operador))
-                {
-                    expressão += var1;
-                }
-                else
-                {
-                    dynamic índice = VariaveisNome.IndexOf(var1);
-                    // System.Console.WriteLine($"VN len {VariaveisNome.Count()}");
-                    // for (int j = 0; j < VariaveisNome.Count; j++)
-                    // {
-                    //     System.Console.Write($"VN[{j}: {VariaveisNome[j]}  ");
-                    //     System.Console.WriteLine($"VV[{j}]: {GetVariávelValor(VariaveisNome[j])}");
-                    // }
-                    // System.Console.WriteLine($"Valor[{índice}] = {var1}");
-                    // int varValor = vv;
-                    // expressão += varValor.ToString();
-                }
-            };
-            System.Console.WriteLine(expressão);
-            // DataTable dt = new();
-            // var v = dt.Compute("1+2*3+4", "");
-            // System.Console.WriteLine(expressão);
-
-            // Debug operação
-            // foreach (KeyValuePair<char, int> item in opÍndice)
-            // {
-            //     System.Console.WriteLine($"{item.Key}:{item.Value}");
-            // }
-
-            // 2. 
-
-            // 2. Para cada operador, verifica se dá para juntar seguindo a precedência
-
-            // // while (opÍndice.Count() > 0)
-            // // {
-            // // obter índice do 1o maior vlaor (precedência)
-            // // obtém chaves
-            // List<char> chaves = opÍndice.Values.ToList();
-            // // transforma em precedência
-            // List<int> precedências = chaves.Select(c => mapOpPrecedência[c]).ToList();
-            // // pega o primeiro maior
-
-            // int MaiorPrecedênciaÍndice = precedências.IndexOf(precedências.Max());
-            // System.Console.WriteLine(chaves);
-            // System.Console.WriteLine($"MP {MaiorPrecedênciaÍndice}");
-            // // converte
-            // foreach (KeyValuePair<int, char> item in opÍndice)
-            // {
-            //     System.Console.WriteLine($"{item.Key}:{item.Value}");
-
-            //     // verificar se antes e depois tem variável
-            //     bool antesExiste = item.Key > 0;
-            //     bool depoisExiste = item.Key < instrução.Tokens.Count();
-            //     if (antesExiste && depoisExiste)
-            //     {
-            //         // bool 
-            //     }
-            // }
-        }
-
-        public char GetRelativeLetter(int offset)
-        {
-            return (char)('a' + offset);
-        }
-
-
-
-        public void SetÍndiceVariáveisLocais(string função)
-        {
-            int índice = ÍndiceVariáveisLocais.IndexOf(função);
-            if (índice == -1)
-            {
-                ÍndiceVariáveisLocais.Add(função);
-            }
-        }
-
-        public string GetNomeVariável(string nome, string função)
-        {
-            string novoNome = nome;
-            int índice = ÍndiceVariáveisLocais.IndexOf(função);
-            if (índice != -1)
-            {
-                novoNome += GetRelativeLetter(índice);
-            }
-            return novoNome;
-        }
-
-        public void SetVariável(string nome, dynamic valor, string função = "")
-        {
-            // Adiciona prefixo para variável local por função
-            if (função.Length > 0)
-            {
-                SetÍndiceVariáveisLocais(função);
-            }
-            // nome = GetNomeVariável(nome, função);
-            Console.WriteLine($"[VAR] {nome} = {valor}");
-
-            // ser variável
-            int índiceNome = VariaveisNome.IndexOf(nome);
-            if (índiceNome == -1)
+            if (!VariaveisNome.Contains(nome))
             {
                 VariaveisNome.Add(nome);
-                VariaveisValor.Add(valor);
+                MemóriaValor.Add(-1);
             }
-            else
+            else if (updateValor != null)
             {
-                VariaveisValor[índiceNome] = valor;
+                int i = VariaveisNome.IndexOf(nome);
+                MemóriaValor[i] = updateValor;
             }
         }
 
-        public dynamic GetVariávelValor(string nome, string função = "")
+        public string AumentarLetra(string texto, int começo = 0)
         {
-            // Se for variável local, adiciona sufixo
-            if (função.Length > 0)
+            char[] letras = texto.ToCharArray();
+            int lastIndex = letras.Length - 1;
+
+            for (int i = lastIndex; i >= começo; i--)
             {
-                nome += ÍndiceVariáveisLocais.IndexOf(função);
+                if (letras[i] >= 'a' && letras[i] < 'z')
+                {
+                    letras[i] = (char)(letras[i] + 1);
+                    return new string(letras);
+                }
+                else if (letras[i] == 'Z')
+                {
+                    letras[i] = 'a';
+                }
             }
 
-            int índiceNome = VariaveisNome.IndexOf(nome);
-            return VariaveisValor[índiceNome];
+            return new string(letras) + 'a';
         }
 
-        public void DelVariável(string nome, dynamic valor, string função = "")
+        public void BOOL(Instrução instrução)
         {
-            nome = GetNomeVariável(nome, função);
-            int índiceNome = VariaveisNome.IndexOf(nome);
-            VariaveisNome.Remove(nome);
-            VariaveisValor.RemoveAt(índiceNome);
+            // obter booleano
+            int índiceOp = -1;
+            foreach (string op in Dados.Booleanos)
+            {
+                int i = instrução.IndexOfValor(op);
+                if (i != -1)
+                {
+                    índiceOp = i;
+                }
+            }
+            if (índiceOp == -1)
+            {
+                return;
+            }
+            string booleano = instrução[índiceOp].Valor;
+            string a = instrução[índiceOp - 1].Valor;
+            string b = instrução[índiceOp + 1].Valor;
+            AssemblyText += @"";
+
+
+            // Criar bool
+            string nome = "ba";
+            while (VariaveisNome.Contains(nome))
+            {
+                nome = AumentarLetra(nome, 1);
+            }
+            // MOVE(nome, 0);
+
+
+            // 
+
         }
 
-        // x = y + x * z - w
+        public void WHILE(List<Instrução> instruções)
+        {
+            /*
+                WHILE (expressão booleana)
+                    <INSTRUÇÕES>
+                END
+
+                IF (expressão booleana)
+                    <INSTRUÇÕES>
+                END
+                ---
+                MOV fimWhile, 32
+                while:
+                
+                -- codigo
+
+                CMP fimWhile, 1
+                JFALSE while
+            */
+            string nome = "WHILE";
+            foreach (Instrução instrução in instruções)
+            {
+                // procura se WHILE existe na linha
+                int índiceWHILE = instrução.IndexOfValor(nome);
+                // Se não existir, vai para a próxima isntrução
+                if (índiceWHILE == -1)
+                {
+                    continue;
+                }
+
+                // Transforma tudo dentro de WHILE em assembly
+
+            }
+        }
 
 
-        //     int i = item.IndexOfValor(nome);
-        //     string x = item.Tokens[i + 1].Valor;
-        //     AssemblyText += $"MOVE {x},0 \n";
+        // Rodar e remover o operador usado
+        // - Executa getListaOperadores - contém o token e a posição na instrução
+
+        public MapOperadores GetMapOperadores(Instrução instrução)
+        {
+            // Obtém um map do índice e token de cada operador
+            MapOperadores mapOperadores = new();
+            for (int i = 0; i < instrução.Count(); i++)
+            {
+                Token token = instrução[i];
+                if (token.Tipos.Contains(TokenTipo.Operador))
+                {
+                    mapOperadores.Add(i, token);
+                }
+            }
+            return mapOperadores;
+        }
+
+        // Somar:
+        // - pega a 1a ocorrência do operador,
+        // - soma o anterior com o próximo
+        // Usa o mesmo nome usado na variável, por enquanto serve
+        public void OperaçãoSoma(Instrução instrução, int índiceOperação)
+        {
+            string a = instrução[índiceOperação - 1].Valor;
+            string b = instrução[índiceOperação + 1].Valor;
+
+
+        }
+
+        public void Operação(Instrução instrução)
+        {
+            // - Pega uma instrução
+            // - obtém uma lista de operadores com o índice da instrução
+            MapOperadores mapOperadores = GetMapOperadores(instrução);
+
+            // - verifica precedência
+            int índiceMaiorPrecedência = instrução.GetFirstOfMaxPrecedência();
+            Token operador = instrução[índiceMaiorPrecedência];
+
+            // - executa cada operação
+            if (operador.Valor == "+")
+            {
+                OperaçãoSoma(instrução, índiceMaiorPrecedência);
+            }
+
+        }
+
     }
-
 }
-
