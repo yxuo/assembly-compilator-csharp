@@ -10,7 +10,7 @@ namespace CompiladorAssembly.Controllers
     {
         public Dictionary<string, string> Registradores { get; set; } = new();
         public List<string> Separadores { get; } = new List<string> { " ", ",", ":", "(", ")" };
-        public IReadOnlyList<string> Operadores { get; } = new List<string> { "=", "+", "-", "*", "/", "==", "<", ">", "!" };
+        public IReadOnlyList<string> Operadores { get; } = new List<string> { "=", "+", "-", "*", "/", "==", "<", ">", "!=" };
         public IReadOnlyList<string> Booleanos { get; } = new List<string> { "==", "<", ">", "!" };
         public List<PalavraChave> PalavrasChave { get; set; } = new List<PalavraChave>
         {
@@ -41,9 +41,10 @@ namespace CompiladorAssembly.Controllers
 
         public string? Variavel { get; set; }
         public string Variavel2 { get; set; } = "";
+        public string ÚltimaVarOperador { get; set; } = "";
         public string Teste { get; set; } = "";
         public bool IniciarLeitura { get; set; } = false;
-        public List<string>? VariaveisNome { get; set; } = new();
+        public List<string> VariaveisNome { get; set; } = new();
         public List<string> InstruçãoLinha { get; set; } = new List<string>();
         public List<dynamic>? MemóriaValor { get; set; } = new();
         public List<string> ÍndiceVariáveisLocais { get; set; } = new List<string>();
@@ -64,6 +65,22 @@ namespace CompiladorAssembly.Controllers
 
         }
 
+            public string Arquivo = @"
+FUNCTION SOMAR1 : a, b
+     VAR resultado
+     resultado = a + b
+     RETURN resultado
+END
+VAR x
+VAR y
+x = LER
+y = LER
+x = SOMAR1(x,y)
+
+WHILE a == b && c == d
+END_WHILE
+
+            ";
         public void GerarTokens(StreamReader arquivo)
         {
             // esvaziar ListaInstruções
@@ -71,9 +88,11 @@ namespace CompiladorAssembly.Controllers
 
             // Para cada linha no arquivo, transforma em token
             // <Enquanto a leitura não estiver no final do arquivo>            
-            while (!arquivo.EndOfStream)
+            foreach (string _linha in Arquivo.Split(new string[] { "\r\n", "\r", "\n" },StringSplitOptions.None))
+            // while (!arquivo.EndOfStream)
             {
-                string? linha = arquivo.ReadLine();
+                string linha = _linha;
+                // string? linha = arquivo.ReadLine();
 
                 // Se a linha for nula, pula para a próxima linha
                 if (linha == null)
@@ -87,15 +106,19 @@ namespace CompiladorAssembly.Controllers
                 linha = linha.Trim();
                 // Remover comentário
                 linha = linha.Split("--")[0];
+                if(linha.Length == 0){
+                    continue;
+                }
+                
                 InstruçãoLinha.Add(linha);
                 // 1 linha = 1 instrução
                 // Converter instrução em string para instrrução em tokens
                 Instrução instrução = ConversorToken.ConverterInstrução(linha, Dados);
 
                 // Debug
-                // Console.WriteLine(linha);
-                // Console.WriteLine(instrução + "\n");
-                // Console.WriteLine("---------");
+                Console.WriteLine(linha);
+                Console.WriteLine(instrução + "\n");
+                Console.WriteLine("---------");
 
 
                 // Adicionar instrução em ListaInstruções
@@ -260,61 +283,106 @@ namespace CompiladorAssembly.Controllers
             }
         }
 
-        public string AumentarLetra(string texto, int começo = 0)
+        public string AumentarLetra(string texto, int começo = 0, char a = 'a', char z = 'z', char zZ = 'Z')
         {
             char[] letras = texto.ToCharArray();
             int lastIndex = letras.Length - 1;
 
             for (int i = lastIndex; i >= começo; i--)
             {
-                if (letras[i] >= 'a' && letras[i] < 'z')
+                if (letras[i] >= a && letras[i] < z)
                 {
                     letras[i] = (char)(letras[i] + 1);
                     return new string(letras);
                 }
-                else if (letras[i] == 'Z')
+                else if (letras[i] == zZ)
                 {
-                    letras[i] = 'a';
+                    letras[i] = a;
                 }
             }
 
-            return new string(letras) + 'a';
+            return new string(letras) + a;
         }
 
-        public void BOOL(Instrução instrução)
+        public string GetÚltimoNomeOperador(string nome = "A")
         {
-            // obter booleano
-            int índiceOp = -1;
-            foreach (string op in Dados.Booleanos)
-            {
-                int i = instrução.IndexOfValor(op);
-                if (i != -1)
-                {
-                    índiceOp = i;
-                }
-            }
-            if (índiceOp == -1)
-            {
-                return;
-            }
-            string booleano = instrução[índiceOp].Valor;
-            string a = instrução[índiceOp - 1].Valor;
-            string b = instrução[índiceOp + 1].Valor;
-            AssemblyText += @"";
-
-
-            // Criar bool
-            string nome = "ba";
             while (VariaveisNome.Contains(nome))
             {
                 nome = AumentarLetra(nome, 1);
             }
-            // MOVE(nome, 0);
+            return nome;
+        }
 
+        public string AddVariávelOperador(string nome)
+        {
+            nome = GetÚltimoNomeOperador(nome);
 
-            // 
+            VariaveisNome.Add(nome);
+            return nome;
 
         }
+
+        // public string BOOL(Instrução instrução, List<int> subÍndices)
+        // {
+        //     // obter booleanos
+        //     List<int> boolÍndices = new();
+        //     int índiceOp = -1;
+        //     foreach (string op in Dados.Booleanos)
+        //     {
+        //         int i = instrução.IndexOfValor(op);
+        //         if (i != -1)
+        //         {
+        //             boolÍndices.Add(i);
+        //         }
+        //     }
+        //     // Sem instruções, retorna
+        //     if (boolÍndices.Count() == 0)
+        //     {
+        //         return "";
+        //     }
+
+        //     // Maior prioridade <-
+
+
+
+        //     // Menor prioridade ->
+        //     System.Console.WriteLine(boolÍndices.ToArray());
+        //     string booleano = instrução[índiceOp].Valor;
+        //     string a = instrução[índiceOp - 1].Valor;
+        //     string b = instrução[índiceOp + 1].Valor;
+        //     if (booleano == "<")
+        //     {
+        //         AssemblyText += $"CMENOR {a}, {b} \n";
+        //     }
+        //     if (booleano == ">")
+        //     {
+        //         AssemblyText += $"CMAIOR {a}, {b} \n";
+        //     }
+        //     if (booleano == "==")
+        //     {
+        //         AssemblyText += $"MOVE A, {a} \n";
+        //         AssemblyText += $"MOVE B, {b} \n";
+        //         AssemblyText += $"MOVE A, CR \n";
+        //         AssemblyText += $"CMP A, B \n";
+        //         AssemblyText += $"MOVE A, CR \n";
+        //     }
+        //     if (booleano == "!=")
+        //     {
+        //         AssemblyText += $"CMP {a}, {b} \n";
+        //         AssemblyText += $"JFALSE {a}, {b} \n";
+        //     }
+
+
+        //     // Criar bool
+        //     string nome = "ba";
+
+        //     // MOVE(nome, 0);
+
+
+        //     // 
+
+        // }
+
 
         public void WHILE(List<Instrução> instruções)
         {

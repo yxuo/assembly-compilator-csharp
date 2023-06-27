@@ -24,16 +24,16 @@ namespace CompiladorAssembly.Models
     {
         public List<TokenTipo> Tipos { get; set; }
         private string valor = "";
-        public int Precedência { get; set; } = -1;
-        public int Ordem
+        public int Ordem { get; set; } = -1;
+        public int Precedência
         {
             get
             {
-                if (Precedência == -1)
+                if (Ordem == -1)
                 {
-                    return Precedência;
+                    return Ordem;
                 }
-                return 3 - Precedência;
+                return 9 - Ordem;
             }
         }
         public string Valor
@@ -45,8 +45,19 @@ namespace CompiladorAssembly.Models
             set
             {
                 // set precedência
-                List<string> precedência = new() { "+", "-", "*", "/" };
-                Precedência = precedência.IndexOf(value);
+                List<string> ordem = new() {
+                    "*",
+                    "/",
+                    "+",
+                    "-",
+                    "==",
+                    "!=",
+                    "<",
+                    ">",
+                    "&&",
+                    "!=",
+                    };
+                Ordem = ordem.IndexOf(value);
                 // set valor
                 this.valor = value;
             }
@@ -90,7 +101,7 @@ namespace CompiladorAssembly.Models
             {
                 return -1;
             }
-            var maxObject = this.MaxBy(x => x.Precedência);
+            var maxObject = this.MaxBy(x => x.Ordem);
             int maxIndex = this.FindIndex(x => x == maxObject);
             return maxIndex;
         }
@@ -105,6 +116,16 @@ namespace CompiladorAssembly.Models
                 }
             }
             return -1;
+        }
+
+        public string ParseString()
+        {
+            string parse = "";
+            foreach (Token token in this)
+            {
+                parse += token.Valor + " ";
+            }
+            return parse;
         }
 
         public override string ToString()
