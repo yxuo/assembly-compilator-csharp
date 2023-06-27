@@ -1,0 +1,6 @@
+INT 1,5
+INT 1,6
+MOVE x,5
+MOVE y,6
+ADD x,y
+

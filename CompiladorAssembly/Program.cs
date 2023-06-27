@@ -1,4 +1,4 @@
-﻿using CompiladorAssembly.Controllers;
+using CompiladorAssembly.Controllers;
 
 namespace CompiladorAssembly
 {

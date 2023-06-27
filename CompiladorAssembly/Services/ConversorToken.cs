@@ -1,4 +1,4 @@
-﻿using CompiladorAssembly.Models;
+using CompiladorAssembly.Models;
 using CompiladorAssembly.Controllers;
 using System.Text.RegularExpressions;
 
@@ -12,9 +12,9 @@ namespace CompiladorAssembly.Services
         /// </summary>
         /// <param name="instrução"> Uma linha de código em pseudocódigo.</param>
         /// <returns>Uma lista de tokens.</returns>
-        public static List<Token> ConverterInstrucao(string instrucao, CompiladorDados compiladorDados)
+        public static Instrução ConverterInstrução(string instrucao, CompiladorDados compiladorDados)
         {
-            List<Token> tokens = new();
+            Instrução tokens = new();
             string[] palavras = Utils.SplitWithDelimiter(instrucao, compiladorDados.Separadores).ToArray();
             // foreach (string s in palavras) { Console.Write("[" + s + "] "); } Console.WriteLine();
 
@@ -29,12 +29,6 @@ namespace CompiladorAssembly.Services
                 }
                 Token token = new(palavra);
 
-                // Se um parâmetro de PalavraChave (VAR, FUNCTION) já definiu o próximo tipo
-                // if (parâmetros.Count > 0)
-                // {
-                //     token.Tipos.Add(parâmetros[0]);
-                //     parâmetros.RemoveAt(0);
-                // }
 
                 // Adiciona os tipos
                 if (StrTokenEVariavel(palavras, i, compiladorDados))
@@ -69,15 +63,10 @@ namespace CompiladorAssembly.Services
                 }
 
                 // Se for palavra-chave, o tipo de token será apenas este.
-                if (StrTokenEPalavraChave(palavra, compiladorDados) && palavra!= null)
+                if (StrTokenEPalavraChave(palavra, compiladorDados) && palavra != null)
                 {
                     token.Tipos.Clear();
                     token.Tipos.Add(TokenTipo.PalavraChave);
-                    // PalavraChave? palavraChave = compiladorDados.PalavrasChave.FirstOrDefault(p => p.Nome == palavra);
-                    // if (palavraChave != null)
-                    // {
-                    //     parâmetros.AddRange(palavraChave.Parâmetros);
-                    // }
                 }
 
                 tokens.Add(token);
@@ -128,8 +117,9 @@ namespace CompiladorAssembly.Services
 
         /// <summary>
         /// Se o token retorna nome válido de variável e afins. <para />
-        /// Não pode conter caracteres especiais <br />
-        /// O primeiro caractere não pode ser número <br />
+        /// Como saber se o token é nome válido de variável?
+        /// - O primeiro caractere não pode ser número <br />
+        /// - Não pode conter caracteres especiais <br />
         /// </summary>
         private static bool StrTokenENomeValido(string palavra)
         {

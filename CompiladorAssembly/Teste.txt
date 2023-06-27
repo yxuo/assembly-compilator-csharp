@@ -8,4 +8,3 @@ VAR y
 x = LER
 y = LER
 x = SOMAR(x,y)
-ESCREVER x

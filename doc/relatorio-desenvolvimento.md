@@ -73,6 +73,7 @@ Temos um impasse que é saber quais os passos a fazer.
 Como validar os tokens?
 * Erro léxico
   * Caractere inválido
+
 * Erro sintático:
   * Padrão inválido
     * `VAR <nome válido não usado>`
@@ -83,5 +84,6 @@ Como validar os tokens?
   * Função não existe
   * Parâmetros incorretos
   * Número de parâmetros incorretos
+
 * Erro semântico
   * Variável, palavra/chave ou função não existe ainda.
