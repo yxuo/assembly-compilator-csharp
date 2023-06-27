@@ -1,4 +1,4 @@
-FUNCTION SOMAR : a, b
+FUNCTION SOMAR1 : a, b
      VAR resultado
      resultado = a + b
      RETURN resultado
@@ -7,4 +7,7 @@ VAR x
 VAR y
 x = LER
 y = LER
-x = SOMAR(x,y)
+x = SOMAR1(x,y)
+
+WHILE a == b && c == d
+END_WHILE
