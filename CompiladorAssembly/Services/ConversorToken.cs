@@ -98,7 +98,7 @@ namespace CompiladorAssembly.Services
 
         private static bool StrTokenEOperador(string palavra, CompiladorDados compiladorDados)
         {
-            return compiladorDados.Operadores.Contains(palavra);
+            return compiladorDados.OperadoresMat.Contains(palavra);
         }
 
         /// <summary>

@@ -21,7 +21,7 @@ public static class ValidadorToken
     private static bool ÉCaractereVálido(char caractere, CompiladorDados compiladorDados)
     {
         bool ÉSeparador = compiladorDados.Separadores.Contains(caractere.ToString());
-        bool ÉOperador = compiladorDados.Operadores.Contains(caractere.ToString());
+        bool ÉOperador = compiladorDados.OperadoresMat.Contains(caractere.ToString());
         return char.IsLetterOrDigit(caractere) || ÉSeparador || ÉOperador;
     }
 

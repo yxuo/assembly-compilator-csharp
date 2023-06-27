@@ -10,8 +10,8 @@ namespace CompiladorAssembly.Controllers
     {
         public Dictionary<string, string> Registradores { get; set; } = new();
         public List<string> Separadores { get; } = new List<string> { " ", ",", ":", "(", ")" };
-        public IReadOnlyList<string> Operadores { get; } = new List<string> { "=", "+", "-", "*", "/", "==", "<", ">", "!=" };
-        public IReadOnlyList<string> Booleanos { get; } = new List<string> { "==", "<", ">", "!" };
+        public IReadOnlyList<string> OperadoresMat { get; } = new List<string> { "=", "+", "-", "*", "/" };
+        public IReadOnlyList<string> OperadoresLogic { get; } = new List<string> { "==", "<", ">", "!=", "&&" };
         public List<PalavraChave> PalavrasChave { get; set; } = new List<PalavraChave>
         {
             new PalavraChaveGenérica("FUNCTION", new List<TokenTipo> { TokenTipo.PalavraChave }),
@@ -25,6 +25,8 @@ namespace CompiladorAssembly.Controllers
         {
             return PalavrasChave.Select(p => p.Nome).ToList();
         }
+
+        public string CR = "CR";
 
     }
 
@@ -65,7 +67,7 @@ namespace CompiladorAssembly.Controllers
 
         }
 
-            public string Arquivo = @"
+        public string Arquivo = @"
 FUNCTION SOMAR1 : a, b
      VAR resultado
      resultado = a + b
@@ -88,7 +90,7 @@ END_WHILE
 
             // Para cada linha no arquivo, transforma em token
             // <Enquanto a leitura não estiver no final do arquivo>            
-            foreach (string _linha in Arquivo.Split(new string[] { "\r\n", "\r", "\n" },StringSplitOptions.None))
+            foreach (string _linha in Arquivo.Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None))
             // while (!arquivo.EndOfStream)
             {
                 string linha = _linha;
@@ -106,10 +108,11 @@ END_WHILE
                 linha = linha.Trim();
                 // Remover comentário
                 linha = linha.Split("--")[0];
-                if(linha.Length == 0){
+                if (linha.Length == 0)
+                {
                     continue;
                 }
-                
+
                 InstruçãoLinha.Add(linha);
                 // 1 linha = 1 instrução
                 // Converter instrução em string para instrrução em tokens
@@ -138,10 +141,11 @@ END_WHILE
             // VAR(listaInstrução);
             LER(listaInstrução);
             FUNCTION();
-            // foreach (Instrução instrução in listaInstrução)
-            // {
-            //     Operador(instrução);
-            // }
+            foreach (Instrução instrução in listaInstrução)
+            {
+                // Operador(instrução);
+                // BOOL(instrução);
+            }
         }
 
         public void LER(List<Instrução> instrução)
@@ -260,15 +264,6 @@ END_WHILE
         }
 
 
-        public void MOVE(string a, string b)
-        {
-            string comando = $"MOVE {a}, {b}";
-            if (!AssemblyText.Contains(comando))
-            {
-                AssemblyText += $"MOVE {a}, {b} \n";
-            }
-        }
-
         public void SetOrUpdateVariaveisNome(string nome, int? updateValor = null)
         {
             if (!VariaveisNome.Contains(nome))
@@ -308,80 +303,92 @@ END_WHILE
         {
             while (VariaveisNome.Contains(nome))
             {
-                nome = AumentarLetra(nome, 1);
+                nome = AumentarLetra(nome, 0, 'A', 'Z');
             }
             return nome;
         }
 
-        public string AddVariávelOperador(string nome)
+        public string AddVariávelOperador(string nome = "A")
         {
             nome = GetÚltimoNomeOperador(nome);
 
             VariaveisNome.Add(nome);
+            MemóriaValor.Add(0);
             return nome;
 
         }
 
-        // public string BOOL(Instrução instrução, List<int> subÍndices)
-        // {
-        //     // obter booleanos
-        //     List<int> boolÍndices = new();
-        //     int índiceOp = -1;
-        //     foreach (string op in Dados.Booleanos)
-        //     {
-        //         int i = instrução.IndexOfValor(op);
-        //         if (i != -1)
-        //         {
-        //             boolÍndices.Add(i);
-        //         }
-        //     }
-        //     // Sem instruções, retorna
-        //     if (boolÍndices.Count() == 0)
-        //     {
-        //         return "";
-        //     }
+        public void BOOL_OP(string op, string a, string b, string nomeA, string nomeB)
+        {
+            AssemblyText += $"MOVE {nomeA}, {a} \n";
+            AssemblyText += $"MOVE {nomeB}, {b} \n";
+            AssemblyText += $"{op} {a}, {b} \n";
+            AssemblyText += $"MOVE {nomeA}, cr \n";
+        }
+        public void BOOL(Instrução instrução)
+        {
+            string cr = Dados.CR;
+            // obter booleanos
+            List<int> boolÍndices = new();
+            Instrução boolOps = new();
+            foreach (string op in Dados.OperadoresLogic)
+            {
+                int i = instrução.IndexOfValor(op);
+                if (i != -1 && Dados.OperadoresLogic.Contains(instrução[i].Valor))
+                {
+                    boolÍndices.Add(i);
+                    boolOps.Add(instrução[i]);
+                }
+            }
+            // Sem instruções, retorna
+            if (boolÍndices.Count() == 0)
+            {
+                return;
+            }
 
-        //     // Maior prioridade <-
+            // Cria N variáveis
+            List<string> vars = new();
+            foreach (int i in boolÍndices)
+            {
+                vars.Add(AddVariávelOperador());
+                vars.Add(AddVariávelOperador());
+            }
 
+            // Enquanto houver operador, pega com maior precedência, calcula e remove
+            while (boolOps.Count() > 0)
+            {
+                int iMaxPreced = boolOps.GetFirstOfMaxPrecedência();
+                int iVarOp = boolÍndices[0];
+                string op = instrução[iMaxPreced].Valor;
+                string a = instrução[iMaxPreced - 1].Valor;
+                string b = instrução[iMaxPreced + 1].Valor;
+                string nomeA = VariaveisNome[iVarOp];
+                string nomeB = VariaveisNome[iVarOp + 1];
+                if (op == "<")
+                {
+                    BOOL_OP("CMENOR", a, b, nomeA, nomeB);
+                    VariaveisNome.Remove(nomeB);
+                }
+                if (op == ">")
+                {
+                    AssemblyText += $"CMAIOR {a}, {b} \n";
+                }
+                if (op == "==")
+                {
+                    AssemblyText += $"MOVE A, {a} \n";
+                    AssemblyText += $"MOVE B, {b} \n";
+                    AssemblyText += $"MOVE A, CR \n";
+                    AssemblyText += $"CMP A, B \n";
+                    AssemblyText += $"MOVE A, CR \n";
+                }
+                if (op == "!=")
+                {
+                    AssemblyText += $"CMP {a}, {b} \n";
+                    AssemblyText += $"JFALSE {a}, {b} \n";
+                }
+            }
 
-
-        //     // Menor prioridade ->
-        //     System.Console.WriteLine(boolÍndices.ToArray());
-        //     string booleano = instrução[índiceOp].Valor;
-        //     string a = instrução[índiceOp - 1].Valor;
-        //     string b = instrução[índiceOp + 1].Valor;
-        //     if (booleano == "<")
-        //     {
-        //         AssemblyText += $"CMENOR {a}, {b} \n";
-        //     }
-        //     if (booleano == ">")
-        //     {
-        //         AssemblyText += $"CMAIOR {a}, {b} \n";
-        //     }
-        //     if (booleano == "==")
-        //     {
-        //         AssemblyText += $"MOVE A, {a} \n";
-        //         AssemblyText += $"MOVE B, {b} \n";
-        //         AssemblyText += $"MOVE A, CR \n";
-        //         AssemblyText += $"CMP A, B \n";
-        //         AssemblyText += $"MOVE A, CR \n";
-        //     }
-        //     if (booleano == "!=")
-        //     {
-        //         AssemblyText += $"CMP {a}, {b} \n";
-        //         AssemblyText += $"JFALSE {a}, {b} \n";
-        //     }
-
-
-        //     // Criar bool
-        //     string nome = "ba";
-
-        //     // MOVE(nome, 0);
-
-
-        //     // 
-
-        // }
+        }
 
 
         public void WHILE(List<Instrução> instruções)
